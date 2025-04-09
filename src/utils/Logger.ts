@@ -14,15 +14,15 @@ export class Logger {
   }
 
   public info(msg: string): void {
-    console.log(msg);
+    this.log(msg);
   }
 
   public err(msg: string | Error | unknown): void {
-    console.log(msg);
+    this.log(JSON.stringify(msg, null, 2));
   }
 
   public warn(msg: string): void {
-    console.log(msg);
+    this.log(msg);
   }
 
   public debug(msg: string): void {
