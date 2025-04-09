@@ -1,17 +1,24 @@
-import { ComputeCoverageOptions, RecordOptions, SaveOptions } from "./index2";
-import { StringUtils } from "./utils/StringUtils";
+import { ComputeCoverageOptions, RecordOptions, SaveOptions } from './index2';
+import { StringUtils } from './utils/StringUtils';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable<Subject> {
-      recordApiRequests(options?: Partial<RecordOptions>): Cypress.Chainable<Subject>;
-      saveApiRequests(options?: Partial<SaveOptions>): Cypress.Chainable<Subject>;
-      computeCoverage(options?: Partial<ComputeCoverageOptions>): Cypress.Chainable<Subject>;
+      recordApiRequests(
+        options?: Partial<RecordOptions>
+      ): Cypress.Chainable<Subject>;
+      saveApiRequests(
+        options?: Partial<SaveOptions>
+      ): Cypress.Chainable<Subject>;
+      computeCoverage(
+        options?: Partial<ComputeCoverageOptions>
+      ): Cypress.Chainable<Subject>;
     }
   }
 }
 
-let requestsLog: Array<any> = [];
+let requestsLog: any[] = [];
 Cypress.Commands.add(
   'recordApiRequests',
   (options?: Partial<RecordOptions>): Cypress.Chainable =>
@@ -36,12 +43,12 @@ Cypress.Commands.add(
     const outDir = (Cypress.env('hars_folders') as string) ?? './';
     const log = {
       log: {
-        version: "1.2",
+        version: '1.2',
         pages: [],
         creator: {
-          name: "@ivamuno/cypress-api-coverage",
-          version: "1.0.0",
-          comment: "https://github.com/ivamuno/cypress-api-coverage#readme"
+          name: '@ivamuno/cypress-api-coverage',
+          version: '1.0.0',
+          comment: 'https://github.com/ivamuno/cypress-api-coverage#readme'
         },
         entries: requestsLog
       }
@@ -56,6 +63,7 @@ Cypress.Commands.add(
         !options?.fileName ? { ext: '.har' } : undefined
       )
     });
+
     return cy.task('saveApiRequestsTask', {
       log,
       outDir,
@@ -68,28 +76,32 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.overwrite("request", (originalFn, ...args) => {
-  let requestDetails : {url?: string | undefined, method?: string | undefined} = { };
-  if(typeof args[0] === "object") {
+Cypress.Commands.overwrite('request', (originalFn, ...args) => {
+  let requestDetails: {
+    url?: string | undefined;
+    method?: string | undefined;
+  } = {};
+  if (typeof args[0] === 'object') {
     requestDetails = { url: args[0].url, method: args[0].method };
   } else {
-    const unknownArgs = args as unknown as Array<any>;
-    if(unknownArgs.length == 2) {
+    const unknownArgs = args as unknown as any[];
+    if (unknownArgs.length === 2) {
       requestDetails = { url: unknownArgs[0], method: 'GET' };
-    } else if(unknownArgs.length == 3) {
+    } else if (unknownArgs.length === 3) {
       requestDetails = { url: unknownArgs[1], method: unknownArgs[0] };
     }
   }
 
   const startedDateTime = Date.now();
-  return originalFn(...args).then((response) => {
+
+  return originalFn(...args).then(response => {
     const requestEndTime = Date.now();
 
     requestsLog.push({
       startedDateTime,
       time: requestEndTime - startedDateTime,
       request: {
-        method: requestDetails.method || "GET",
+        method: requestDetails.method || 'GET',
         url: requestDetails.url
       },
       response: {
@@ -106,12 +118,13 @@ Cypress.Commands.add(
   'computeCoverage',
   (options?: Partial<ComputeCoverageOptions>): Cypress.Chainable => {
     const outDir = (Cypress.env('hars_folders') as string) ?? './';
+
     return cy.task('computeCoverageTask', {
       rootDir: outDir,
       ...options,
       includeHosts: options?.includeHosts?.map(x =>
         StringUtils.toRegexSource(x)
       )
-    })
+    });
   }
 );

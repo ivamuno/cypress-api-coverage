@@ -180,12 +180,6 @@ module.exports = {
         }
       ],
       'max-classes-per-file': ['error', 1],
-      'max-depth': [
-        'error',
-        {
-          max: 2
-        }
-      ],
       'default-param-last': 'off',
       'no-bitwise': 'error',
       'no-caller': 'error',

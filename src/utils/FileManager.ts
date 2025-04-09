@@ -1,4 +1,4 @@
-import { Logger } from './Logger'
+import { Logger } from './Logger';
 import { promisify } from 'util';
 import {
   access,
@@ -28,6 +28,7 @@ export class FileManager {
       return await promisify(readdir)(path);
     } catch (e) {
       Logger.Instance.err(e);
+
       return [];
     }
   }
@@ -37,6 +38,7 @@ export class FileManager {
       return await promisify(readFile)(path, { encoding: 'utf-8' });
     } catch (e) {
       Logger.Instance.err(e);
+
       return undefined;
     }
   }
