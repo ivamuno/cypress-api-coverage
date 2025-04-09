@@ -94,6 +94,7 @@
   "dependencies": {
     "@neuralegion/cypress-har-generator": "^5.17.0",
     "@redocly/openapi-core": "^1.34.2",
+    "chalk": "^5.4.1",
     "tslib": "^2.4.0"
   }
 }

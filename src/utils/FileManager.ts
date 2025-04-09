@@ -25,7 +25,6 @@ export class FileManager {
 
   public async readDir(path: string): Promise<string[]> {
     try {
-      Logger.Instance.info('Reading dir' + path);
       return await promisify(readdir)(path);
     } catch (e) {
       Logger.Instance.err(e);
@@ -35,7 +34,6 @@ export class FileManager {
 
   public async readFile(path: string): Promise<string | undefined> {
     try {
-      Logger.Instance.info('Reading file' + path);
       return await promisify(readFile)(path, { encoding: 'utf-8' });
     } catch (e) {
       Logger.Instance.err(e);

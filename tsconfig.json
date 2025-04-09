@@ -30,7 +30,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "typeRoots": ["node_modules/@types", "typings"],
-    "types": ["cypress", "node"]
+    "types": ["node"]
   },
   "ts-node": {
     "compilerOptions": {

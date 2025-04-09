@@ -1,4 +1,4 @@
-import { ComputeCoverageOptions, RecordOptions, SaveOptions } from ".";
+import { ComputeCoverageOptions, RecordOptions, SaveOptions } from "./index2";
 import { StringUtils } from "./utils/StringUtils";
 
 declare global {
