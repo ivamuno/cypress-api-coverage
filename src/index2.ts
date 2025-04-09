@@ -1,8 +1,6 @@
-import { ComputeCoverageTaskOptions, Plugin, SaveTaskOptions } from './Plugin';
+import { Plugin, SaveTaskOptions } from './Plugin';
 import { FileManager } from './utils/FileManager';
-import CypressHarGenerator, {
-  install as installHarGenerator
-} from '@neuralegion/cypress-har-generator';
+import CypressHarGenerator, { install as installHarGenerator } from '@neuralegion/cypress-har-generator';
 
 const plugin = new Plugin(FileManager.Instance);
 
@@ -21,8 +19,11 @@ export interface SaveOptions {
 }
 
 export interface ComputeCoverageOptions {
+  suiteName: string;
   outDir: string;
-  includeHosts?: string[];
+  specsPath: string;
+  includeHosts: { host: string; replacement?: string }[];
+  outputName?: string;
 }
 
 export const install = (on: Cypress.PluginEvents): void => {
@@ -34,29 +35,18 @@ export const install = (on: Cypress.PluginEvents): void => {
 
       return null;
     },
-    computeCoverageTask: async (
-      options: ComputeCoverageTaskOptions
-    ): Promise<null> => {
+    computeCoverageTask: async (options: ComputeCoverageOptions): Promise<null> => {
       await plugin.computeCoverage(options);
 
       return null;
     }
   });
 
-  on(
-    'before:browser:launch',
-    (
-      browser: Cypress.Browser | null,
-      launchOptions: Cypress.BeforeBrowserLaunchOptions
-    ) => {
-      CypressHarGenerator.ensureBrowserFlags(
-        (browser ?? {}) as Cypress.Browser,
-        launchOptions
-      );
+  on('before:browser:launch', (browser: Cypress.Browser | null, launchOptions: Cypress.BeforeBrowserLaunchOptions) => {
+    CypressHarGenerator.ensureBrowserFlags((browser ?? {}) as Cypress.Browser, launchOptions);
 
-      return launchOptions;
-    }
-  );
+    return launchOptions;
+  });
 };
 
 export { ensureBrowserFlags } from '@neuralegion/cypress-har-generator';

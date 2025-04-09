@@ -19,10 +19,7 @@ export class StringUtils {
     return this.removeTrailingSlash(dirname);
   }
 
-  public static normalizeName(
-    path: string,
-    options?: { ext?: string }
-  ): string {
+  public static normalizeName(path: string, options?: { ext?: string }): string {
     const fileNameIdx = this.fileNameIdx(path);
     const name = this.removeLeadingSlash(path.substring(fileNameIdx));
 
@@ -39,10 +36,7 @@ export class StringUtils {
     return `${nameWithoutExt}${ext ?? '.har'}`;
   }
 
-  public static escapeCharacters(
-    str: string,
-    chars: string = '^[]{}()\\\\.$*+?|'
-  ): string {
+  public static escapeCharacters(str: string, chars: string = '^[]{}()\\\\.$*+?|'): string {
     let foundChar = false;
 
     const length = chars.length;
@@ -72,9 +66,7 @@ export class StringUtils {
   }
 
   private static fileNameIdx(path: string): number {
-    return path.indexOf('\\') >= 0
-      ? path.lastIndexOf('\\')
-      : path.lastIndexOf('/');
+    return path.indexOf('\\') >= 0 ? path.lastIndexOf('\\') : path.lastIndexOf('/');
   }
 
   private static removeLeadingSlash(path: string): string {

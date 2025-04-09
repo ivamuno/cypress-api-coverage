@@ -1,11 +1,6 @@
 import { FileManager } from './utils/FileManager';
-import {
-  bundle,
-  loadConfig,
-  Oas2Definition,
-  Oas3_1Definition,
-  Oas3Definition
-} from '@redocly/openapi-core';
+import { ComputeCoverageOptions } from './index2';
+import { bundle, loadConfig, Oas2Definition, Oas3_1Definition, Oas3Definition } from '@redocly/openapi-core';
 import chalk from 'chalk';
 import { join } from 'path';
 
@@ -13,14 +8,6 @@ export interface SaveTaskOptions {
   log: any;
   fileName: string;
   outDir: string;
-}
-
-export interface ComputeCoverageTaskOptions {
-  suiteName: string;
-  rootDir: string;
-  specsPath: string;
-  includeHosts: { host: string; replacement?: string }[];
-  outputName?: string;
 }
 
 interface CoverageResultCoverage {
@@ -53,49 +40,33 @@ export class Plugin {
     this.fileManager.writeFile(filePath, JSON.stringify(options.log, null, 2));
   }
 
-  public async computeCoverage(
-    options: ComputeCoverageTaskOptions
-  ): Promise<void> {
+  public async computeCoverage(options: ComputeCoverageOptions): Promise<void> {
     const operations = await this.normalizeHar(options);
     const apiSpecs = await this.parseSpecs(options.specsPath);
     this.computeCoverageResult(operations, apiSpecs);
-    const apiCoverageOutputName = join(
-      options.rootDir,
-      (options.outputName || this.defaultOutputName) + '.json'
-    );
-    await this.fileManager.writeFile(
-      apiCoverageOutputName,
-      JSON.stringify(apiSpecs, null, 2)
-    );
+    const apiCoverageOutputName = join(options.outDir, (options.outputName || this.defaultOutputName) + '.json');
+    await this.fileManager.writeFile(apiCoverageOutputName, JSON.stringify(apiSpecs, null, 2));
     await this.writeReport(options, apiSpecs);
     this.displayReport(apiSpecs.coverage);
   }
 
-  private async normalizeHar(
-    options: ComputeCoverageTaskOptions
-  ): Promise<string[]> {
-    const files = (await this.fileManager.readDir(options.rootDir)).filter(x =>
-      x.endsWith('.har')
-    );
+  private async normalizeHar(options: ComputeCoverageOptions): Promise<string[]> {
+    const files = (await this.fileManager.readDir(options.outDir)).filter(x => x.endsWith('.har'));
 
     const rawOperations: string[] = [];
     for (const file of files) {
-      const data = await this.fileManager.readFile(join(options.rootDir, file));
+      const data = await this.fileManager.readFile(join(options.outDir, file));
       if (!data) {
         continue;
       }
 
-      const entries: { request: { method: string; url: string } }[] =
-        JSON.parse(data).log.entries;
+      const entries: { request: { method: string; url: string } }[] = JSON.parse(data).log.entries;
       for (const entry of entries) {
         const url = entry.request.url.split('?')[0] ?? '';
         for (const host of options.includeHosts) {
           if (url.startsWith(host.host)) {
             const method = entry.request.method;
-            const operation = this.buildOperation(
-              url.replace(host.host, host.replacement || ''),
-              method
-            );
+            const operation = this.buildOperation(url.replace(host.host, host.replacement || ''), method);
             if (!rawOperations.includes(operation)) {
               rawOperations.push(operation);
             }
@@ -111,8 +82,7 @@ export class Plugin {
   private async parseSpecs(pathToApi: string): Promise<CoverageResult> {
     const config = await loadConfig();
     const bundleResults = await bundle({ ref: pathToApi, config });
-    const specs: Oas2Definition | Oas3Definition | Oas3_1Definition =
-      bundleResults.bundle.parsed;
+    const specs: Oas2Definition | Oas3Definition | Oas3_1Definition = bundleResults.bundle.parsed;
     const paths = specs.paths || {};
 
     const result: CoverageResult = {
@@ -140,10 +110,7 @@ export class Plugin {
     return result;
   }
 
-  private computeCoverageResult(
-    operations: string[],
-    coverageResult: CoverageResult
-  ): void {
+  private computeCoverageResult(operations: string[], coverageResult: CoverageResult): void {
     for (const path of Object.keys(coverageResult.paths)) {
       const verbs = coverageResult.paths[path].verbs;
       for (const v of Object.keys(verbs)) {
@@ -165,18 +132,10 @@ export class Plugin {
     await this.fileManager.appendFile(filename, line);
   }
 
-  private async appendProgress(
-    filename: string,
-    coverage: CoverageResultCoverage
-  ) {
+  private async appendProgress(filename: string, coverage: CoverageResultCoverage) {
     const progress = Math.round((coverage.totalCovered / coverage.total) * 100);
 
-    const color =
-      progress >= this.defaultThresholds.ok
-        ? '5cb85c'
-        : progress >= this.defaultThresholds.warning
-        ? 'f0ad4e'
-        : 'd9534f';
+    const color = progress >= this.defaultThresholds.ok ? '5cb85c' : progress >= this.defaultThresholds.warning ? 'f0ad4e' : 'd9534f';
 
     await this.appendLine(
       filename,
@@ -184,29 +143,17 @@ export class Plugin {
     );
   }
 
-  private async writeReport(
-    options: ComputeCoverageTaskOptions,
-    result: CoverageResult
-  ) {
-    const apiReportCoverageOutputName = join(
-      options.rootDir,
-      (options.outputName || this.defaultOutputName) + '.md'
-    );
+  private async writeReport(options: ComputeCoverageOptions, result: CoverageResult) {
+    const apiReportCoverageOutputName = join(options.outDir, (options.outputName || this.defaultOutputName) + '.md');
     await this.fileManager.writeFile(apiReportCoverageOutputName, '');
-    await this.appendLine(
-      apiReportCoverageOutputName,
-      `# ${options.suiteName}\r\n\r\n`
-    );
+    await this.appendLine(apiReportCoverageOutputName, `# ${options.suiteName}\r\n\r\n`);
     await this.appendLine(apiReportCoverageOutputName, `## Total:\r\n`);
     await this.appendProgress(apiReportCoverageOutputName, result.coverage);
 
     await this.appendLine(apiReportCoverageOutputName, `## Channels:\r\n`);
     for (const path of Object.keys(result.paths)) {
       await this.appendLine(apiReportCoverageOutputName, `### ${path}\r\n`);
-      await this.appendProgress(
-        apiReportCoverageOutputName,
-        result.paths[path].coverage
-      );
+      await this.appendProgress(apiReportCoverageOutputName, result.paths[path].coverage);
     }
   }
 

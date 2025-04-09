@@ -1,15 +1,6 @@
 import { Logger } from './Logger';
 import { promisify } from 'util';
-import {
-  access,
-  constants,
-  mkdir,
-  unlink,
-  writeFile,
-  readFile,
-  readdir,
-  appendFile
-} from 'fs';
+import { access, constants, mkdir, unlink, writeFile, readFile, readdir, appendFile } from 'fs';
 
 export class FileManager {
   private static _instance: FileManager;

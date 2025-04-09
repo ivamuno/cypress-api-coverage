@@ -5,15 +5,9 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable<Subject> {
-      recordApiRequests(
-        options?: Partial<RecordOptions>
-      ): Cypress.Chainable<Subject>;
-      saveApiRequests(
-        options?: Partial<SaveOptions>
-      ): Cypress.Chainable<Subject>;
-      computeCoverage(
-        options?: Partial<ComputeCoverageOptions>
-      ): Cypress.Chainable<Subject>;
+      recordApiRequests(options?: Partial<RecordOptions>): Cypress.Chainable<Subject>;
+      saveApiRequests(options?: Partial<SaveOptions>): Cypress.Chainable<Subject>;
+      computeCoverage(options?: Partial<ComputeCoverageOptions>): Cypress.Chainable<Subject>;
     }
   }
 }
@@ -27,54 +21,41 @@ Cypress.Commands.add(
       includeBlobs: false,
       rootDir: StringUtils.dirname(Cypress.spec.absolute),
       ...options,
-      excludePaths: options?.excludePaths?.map(x =>
-        StringUtils.toRegexSource(x)
-      ),
-      includeHosts: options?.includeHosts?.map(x =>
-        StringUtils.toRegexSource(x)
-      )
+      excludePaths: options?.excludePaths?.map(x => StringUtils.toRegexSource(x)),
+      includeHosts: options?.includeHosts?.map(x => StringUtils.toRegexSource(x))
     })
 );
 
-Cypress.Commands.add(
-  'saveApiRequests',
-  (options?: Partial<SaveOptions>): Cypress.Chainable => {
-    const fallbackFileName = Cypress.spec.name;
-    const outDir = (Cypress.env('hars_folders') as string) ?? './';
-    const log = {
-      log: {
-        version: '1.2',
-        pages: [],
-        creator: {
-          name: '@ivamuno/cypress-api-coverage',
-          version: '1.0.0',
-          comment: 'https://github.com/ivamuno/cypress-api-coverage#readme'
-        },
-        entries: requestsLog
-      }
-    };
+Cypress.Commands.add('saveApiRequests', (options?: Partial<SaveOptions>): Cypress.Chainable => {
+  const fallbackFileName = Cypress.spec.name;
+  const outDir = (Cypress.env('hars_folders') as string) ?? './';
+  const log = {
+    log: {
+      version: '1.2',
+      pages: [],
+      creator: {
+        name: '@ivamuno/cypress-api-coverage',
+        version: '1.0.0',
+        comment: 'https://github.com/ivamuno/cypress-api-coverage#readme'
+      },
+      entries: requestsLog
+    }
+  };
 
-    requestsLog = [];
-    cy.task('saveHar', {
-      outDir,
-      ...options,
-      fileName: StringUtils.normalizeName(
-        options?.fileName ?? fallbackFileName,
-        !options?.fileName ? { ext: '.har' } : undefined
-      )
-    });
+  requestsLog = [];
+  cy.task('saveHar', {
+    outDir,
+    ...options,
+    fileName: StringUtils.normalizeName(options?.fileName ?? fallbackFileName, !options?.fileName ? { ext: '.har' } : undefined)
+  });
 
-    return cy.task('saveApiRequestsTask', {
-      log,
-      outDir,
-      ...options,
-      fileName: StringUtils.normalizeName(
-        options?.fileName ?? fallbackFileName,
-        !options?.fileName ? { ext: '.api.har' } : undefined
-      )
-    });
-  }
-);
+  return cy.task('saveApiRequestsTask', {
+    log,
+    outDir,
+    ...options,
+    fileName: StringUtils.normalizeName(options?.fileName ?? fallbackFileName, !options?.fileName ? { ext: '.api.har' } : undefined)
+  });
+});
 
 Cypress.Commands.overwrite('request', (originalFn, ...args) => {
   let requestDetails: {
@@ -114,17 +95,11 @@ Cypress.Commands.overwrite('request', (originalFn, ...args) => {
   });
 });
 
-Cypress.Commands.add(
-  'computeCoverage',
-  (options?: Partial<ComputeCoverageOptions>): Cypress.Chainable => {
-    const outDir = (Cypress.env('hars_folders') as string) ?? './';
+Cypress.Commands.add('computeCoverage', (options?: Partial<ComputeCoverageOptions>): Cypress.Chainable => {
+  const outDir = (Cypress.env('hars_folders') as string) ?? './';
 
-    return cy.task('computeCoverageTask', {
-      rootDir: outDir,
-      ...options,
-      includeHosts: options?.includeHosts?.map(x =>
-        StringUtils.toRegexSource(x)
-      )
-    });
-  }
-);
+  return cy.task('computeCoverageTask', {
+    outDir,
+    ...options
+  });
+});
