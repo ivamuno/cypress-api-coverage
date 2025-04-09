@@ -7,7 +7,8 @@ import {
   unlink,
   writeFile,
   readFile,
-  readdir
+  readdir,
+  appendFile
 } from 'fs';
 
 export class FileManager {
@@ -46,6 +47,14 @@ export class FileManager {
     try {
       await this.removeFile(path);
       await promisify(writeFile)(path, data);
+    } catch (e) {
+      Logger.Instance.err(e);
+    }
+  }
+
+  public async appendFile(path: string, data: string): Promise<void> {
+    try {
+      await promisify(appendFile)(path, data);
     } catch (e) {
       Logger.Instance.err(e);
     }
