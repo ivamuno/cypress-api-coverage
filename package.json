@@ -45,8 +45,7 @@
     "lint": "eslint -c .eslintrc.js 'src/**/*.ts'",
     "format": "prettier --check 'src/**/*.ts'",
     "build": "webpack --config webpack.config.ts",
-    "prepublishOnly": "npm run build",
-    "prepare": "is-ci || husky install"
+    "prepublishOnly": "npm run build"
   },
   "homepage": "https://github.com/ivamuno/cypress-api-coverage#readme",
   "devDependencies": {
@@ -70,7 +69,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "filemanager-webpack-plugin": "^7.0.0",
-    "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "~2.8.4",
     "semantic-release": "^24.2.3",
@@ -88,14 +86,6 @@
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
-    ]
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint --fix"
-    ],
-    "*.{ts,js,json,md}": [
-      "prettier --write"
     ]
   },
   "peerDependencies": {

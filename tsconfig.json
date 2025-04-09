@@ -22,7 +22,6 @@
     "noUncheckedIndexedAccess": false,
     "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
