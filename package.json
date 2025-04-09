@@ -1,6 +1,6 @@
 {
   "name": "@ivamuno/cypress-api-coverage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Cypress plugin to generate API coverage reports",
   "repository": {
