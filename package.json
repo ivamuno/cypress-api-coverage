@@ -1,0 +1,102 @@
+{
+  "name": "@ivamuno/cypress-api-coverage",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Cypress plugin to generate API coverage reports",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivamuno/cypress-api-coverage.git"
+  },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "commands.js",
+    "commands.js.map"
+  ],
+  "author": {
+    "name": "Iván Muñoz",
+    "email": "ivan.munoz.mozo@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ivamuno/cypress-api-coverage/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "cypress",
+    "har",
+    "electron",
+    "cypress-plugin",
+    "chrome",
+    "http-archive",
+    "testing",
+    "qa",
+    "automation",
+    "typescript",
+    "chromium",
+    "qatools",
+    "coverage"
+  ],
+  "scripts": {
+    "semantic-release": "semantic-release",
+    "lint": "eslint -c .eslintrc.js 'src/**/*.ts'",
+    "format": "prettier --check 'src/**/*.ts'",
+    "build": "webpack --config webpack.config.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "homepage": "https://github.com/ivamuno/cypress-api-coverage#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@types/cypress": "^1.1.6",
+    "@types/node": "~18.19.50",
+    "@types/webpack": "^5.28.0",
+    "@types/webpack-node-externals": "^2.5.3",
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
+    "@typescript-eslint/parser": "^5.36.2",
+    "cypress": "^13.17.0",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "filemanager-webpack-plugin": "^7.0.0",
+    "lint-staged": "^13.0.3",
+    "prettier": "~2.8.4",
+    "semantic-release": "^24.1.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.3.1",
+    "ts-mockito": "^2.6.1",
+    "ts-node": "~10.9.1",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "~4.8.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ],
+    "*.{ts,js,json,md}": [
+      "prettier --write"
+    ]
+  },
+  "peerDependencies": {
+    "cypress": ">=4.4.1 <12.12.0 || >=12.17.0"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0",
+    "@neuralegion/cypress-har-generator": "^5.17.0"
+  }
+}
