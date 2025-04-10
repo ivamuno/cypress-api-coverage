@@ -1,5 +1,5 @@
 import { FileManager } from './utils/FileManager';
-import { ComputeCoverageOptions } from './index2';
+import { ComputeCoverageOptions } from '.';
 import { bundle, loadConfig, Oas2Definition, Oas3_1Definition, Oas3Definition } from '@redocly/openapi-core';
 import chalk from 'chalk';
 import { join } from 'path';

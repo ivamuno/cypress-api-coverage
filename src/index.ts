@@ -1,21 +1,52 @@
-import { Plugin } from './Plugin';
+import { Plugin, SaveTaskOptions } from './Plugin';
 import { FileManager } from './utils/FileManager';
+import CypressHarGenerator, { install as installHarGenerator } from '@neuralegion/cypress-har-generator';
 
-new Plugin(FileManager.Instance)
-  .computeCoverage({
-    suiteName: 'api-coverage',
-    rootDir: './src/test/hars',
-    specsPath: './src/test/api.yaml',
-    includeHosts: [
-      { host: 'https://api.sandbox.dev.getpaid.io' },
-      {
-        host: 'https://dashboard.dev.getpaid.io/sandbox/v2/dashboard',
-        replacement: '/v2alpha1'
-      }
-    ],
-    outputName: 'api-coverage'
-  })
-  .then(() => {
-    // eslint-disable-next-line no-console
-    console.log('Coverage computed successfully.');
+const plugin = new Plugin(FileManager.Instance);
+
+export interface RecordOptions {
+  rootDir: string;
+  filter?: string;
+  transform?: string;
+  excludePaths?: (string | RegExp)[];
+  includeHosts?: (string | RegExp)[];
+  excludeStatusCodes?: number[];
+}
+
+export interface SaveOptions {
+  fileName: string;
+  outDir: string;
+}
+
+export interface ComputeCoverageOptions {
+  suiteName: string;
+  outDir: string;
+  specsPath: string;
+  includeHosts: { host: string; replacement?: string }[];
+  outputName?: string;
+}
+
+export const install = (on: Cypress.PluginEvents): void => {
+  installHarGenerator(on);
+
+  on('task', {
+    saveApiRequestsTask: async (options: SaveTaskOptions): Promise<null> => {
+      await plugin.saveApiRequests(options);
+
+      return null;
+    },
+    computeCoverageTask: async (options: ComputeCoverageOptions): Promise<null> => {
+      await plugin.computeCoverage(options);
+
+      return null;
+    }
   });
+
+  on('before:browser:launch', (browser: Cypress.Browser | null, launchOptions: Cypress.BeforeBrowserLaunchOptions) => {
+    CypressHarGenerator.ensureBrowserFlags((browser ?? {}) as Cypress.Browser, launchOptions);
+
+    return launchOptions;
+  });
+};
+
+export { ensureBrowserFlags } from '@neuralegion/cypress-har-generator';
